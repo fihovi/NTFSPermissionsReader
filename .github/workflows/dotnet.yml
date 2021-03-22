@@ -24,7 +24,7 @@ jobs:
     - name: Restore NuGet packages
       run: nuget restore NTFSPermissions.sln
     
-    - uses: warrenbuckley/Setup-MSBuild@v1"
+    - uses: warrenbuckley/Setup-MSBuild@latest"
     - run: msbuild NTFSPermissions.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
       env: 
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
