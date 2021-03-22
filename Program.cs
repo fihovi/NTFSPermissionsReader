@@ -4,26 +4,36 @@ using CommandLine;
 
 namespace NTFSPermissions
 {
-    class Program
+    internal abstract class Program
     {
-        public class Options
-        { 
+        private abstract class Options
+        {
+            protected Options(string exportLocationPath, string scanLocationPath, bool verbose, bool forceScan, bool allowSystemAccounts, string csvFilename)
+            {
+                ExportLocationPath = exportLocationPath;
+                ScanLocationPath = scanLocationPath;
+                Verbose = verbose;
+                ForceScan = forceScan;
+                AllowSystemAccounts = allowSystemAccounts;
+                CsvFilename = csvFilename;
+            }
+
             [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
-            public bool Verbose { get; set; }
+            public bool Verbose { get; private set; }
             [Option('i', "input", Required = true, HelpText = "ScanLocation")]
-            public string ScanLocationPath { get; set; }
+            public string ScanLocationPath { get; private set; }
             [Option('o', "output", Required = true, HelpText = "Export Location for csv file")]
-            public string ExportLocationPath { get; set; }
+            public string ExportLocationPath { get; private set; }
             [Option('f', "force", Required = false, Default = false, HelpText = "Force skip check for scan")]
-            public bool ForceScan { get; set; }
+            public bool ForceScan { get; private set; }
 
             [Option('s', "systemAccounts", Default = false, Required = false, HelpText = "Allow to include system Accounts in the report.")]
-            public bool AllowSystemAccounts { get; set; }
-            [Option('n', "filename", Default = "", Required = false, HelpText = "Nazev souboru")]
-            public string CSVFilename { get; set; }
+            public bool AllowSystemAccounts { get; private set; }
+            [Option('n', "filename", Default = "", Required = false, HelpText = "Define filename of the report")]
+            public string CsvFilename { get; private set; }
         }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             string scanLocation = "";
             string exportLocation = "";
@@ -35,8 +45,8 @@ namespace NTFSPermissions
                 .WithParsed<Options>(o =>
                 {
                     Console.WriteLine(o.Verbose
-                        ? $@"Verbose output enabled. Current Arguments: -v {o.Verbose}"
-                        : $@"Current Arguments: -v {o.Verbose}");
+                        ? $@"Verbose output enabled. Current Arguments: -v {o.Verbose.ToString()}"
+                        : $@"Current Arguments: -v {o.Verbose.ToString()}");
 
                     if (o.ScanLocationPath != "")
                         scanLocation = o.ScanLocationPath;
@@ -48,8 +58,8 @@ namespace NTFSPermissions
                     else
                         Console.WriteLine(@"exportLocation is not defined.");
 
-                    if (o.CSVFilename != "")
-                        csvFilename = o.CSVFilename;
+                    if (o.CsvFilename != "")
+                        csvFilename = o.CsvFilename;
 
                     forceScan = o.ForceScan;
 
@@ -61,20 +71,20 @@ namespace NTFSPermissions
 
             Console.WriteLine(@"Scan location: " + scanLocation);
             Console.WriteLine(@"csv output: " + exportLocation);
-            Console.WriteLine(@"Show system accounts in report: " + showSystemAccount);
+            Console.WriteLine(@"Show system accounts in report: {0}", showSystemAccount.ToString());
 
             if (!forceScan)
             {
 
                 // ReSharper disable StringLiteralTypo
                 Console.Write(@"Chcete pokračovat? (y/n)");
-                string userResponse = Console.ReadLine();
+                var userResponse = Console.ReadLine();
                 switch (userResponse)
                 {
                     case "y":
                         // ReSharper disable StringLiteralTypo
                         Console.WriteLine(@"Calling scan function");
-                        Audit audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount, csvFilename);
+                        var audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount, csvFilename);
                         Console.ReadKey();
                         break;
                     default:
@@ -86,7 +96,7 @@ namespace NTFSPermissions
             }
             else
             {
-                Audit audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount, csvFilename);
+                var audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount, csvFilename);
             }
 
             Console.ReadKey();
