@@ -24,13 +24,20 @@ jobs:
     - name: Restore NuGet packages
       run: nuget restore NTFSPermissions.sln
     
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+    - uses: warrenbuckley/Setup-MSBuild@v1
+    - run: msbuild NTFSPermissions.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v1.0.0
       with:
-        dotnet-version: 4.7.2
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+        name: published_webapp
+        path: bin\Release\Publish    
+    #- name: Setup .NET
+#      uses: actions/setup-dotnet@v1
+#      with:
+#        dotnet-version: 4.7.2
+#    - name: Restore dependencies
+#      run: dotnet restore
+#    - name: Build
+#      run: dotnet build --no-restore
+#    - name: Test
+#      run: dotnet test --no-build --verbosity normal
