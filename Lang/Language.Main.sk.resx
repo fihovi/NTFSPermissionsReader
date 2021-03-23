@@ -1,0 +1,44 @@
+﻿<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="Continue" xml:space="preserve">
+        <value>Želáte si pokračovať? (a/n)</value>
+    </data>
+    <data name="ShowSystemAccount" xml:space="preserve">
+        <value>Zobrazit systémový účet v reportu. {0}</value>
+    </data>
+    <data name="ExportLocation" xml:space="preserve">
+        <value>Cesta exportu je: {0}</value>
+    </data>
+    <data name="NotDefined" xml:space="preserve">
+        <value>{0} není definován</value>
+    </data>
+    <data name="Scan" xml:space="preserve">
+        <value>Sken</value>
+    </data>
+    <data name="ScanFinished" xml:space="preserve">
+        <value>Sken by mal byt hotov</value>
+    </data>
+    <data name="ScanLocation" xml:space="preserve">
+        <value>Cesta Skenu</value>
+    </data>
+    <data name="Scanning" xml:space="preserve">
+        <value>Skenuji...</value>
+    </data>
+    <data name="Export" xml:space="preserve">
+        <value>Export</value>
+    </data>
+    <data name="Exiting" xml:space="preserve">
+        <value>Program se vypíná...</value>
+    </data>
+</root>
