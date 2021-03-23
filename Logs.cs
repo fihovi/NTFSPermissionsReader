@@ -40,7 +40,6 @@ namespace NTFSPermissions
         }
 
         // Add multiple lines to the logfile
-        public void AddListToPermissionsLogFile(List<string> logs)
         public void AddListToPermissionsLogFile(IEnumerable<string> logs)
         {
             try

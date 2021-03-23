@@ -14,9 +14,6 @@
     <data name="Continue" xml:space="preserve">
         <value>Přejete si pokračovat? (a/n)</value>
     </data>
-    <data name="ShowSystemAccount" xml:space="preserve">
-        <value>Zobrazit systémový účet v reportu. {0}</value>
-    </data>
     <data name="Exiting" xml:space="preserve">
         <value>Program se vypíná...</value>
     </data>
@@ -40,5 +37,8 @@
     </data>
     <data name="Scanning" xml:space="preserve">
         <value>Skenuji...</value>
+    </data>
+    <data name="ShowSystemAccount" xml:space="preserve">
+        <value>Zobrazit systémový účet v reportu. {0}</value>
     </data>
 </root>

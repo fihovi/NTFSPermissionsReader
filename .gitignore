@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /.idea/
 /.actrc
+/LanguagesMain.csv
+/Lang/test.Designer.cs

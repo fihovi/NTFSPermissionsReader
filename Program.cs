@@ -2,7 +2,6 @@
 using CommandLine;
 using NTFSPermissions.Lang;
 
-
 namespace NTFSPermissions
 {
     class Program
@@ -27,9 +26,9 @@ namespace NTFSPermissions
 
             [Option('p', "prefix", Default = "", Required = false, HelpText = @"Prefix of the report")]
             public string CsvFilename { get; set; }
-            [Option('m', "summary", Default = "", Required = false, HelpText = @"Summary on the end of a report")]
-            public string Summary { get; set; }
 
+            [Option('m', "summary", Default = false, Required = false, HelpText = @"Summary on the end of a report")]
+            public bool Summary { get; set; }
         }
 
         private static void Main(string[] args)
@@ -38,6 +37,7 @@ namespace NTFSPermissions
             string exportLocation = "";
             bool showSystemAccount = false;
             bool forceScan = false;
+            bool summary = true;
             string csvFilename = "";
 
             Parser.Default.ParseArguments<Options>(args)
@@ -60,9 +60,11 @@ namespace NTFSPermissions
                     else
                         Console.WriteLine(Language_Main.NotDefined, Language_Main.Export);
 
+
                     if (o.CsvFilename != "")
                         csvFilename = o.CsvFilename;
-
+                    summary = o.Summary;
+                    Console.WriteLine(@"Summary: {0}", summary);
                     forceScan = o.ForceScan;
 
                     /*Console.WriteLine(o.AllowSystemAccounts
@@ -89,7 +91,7 @@ namespace NTFSPermissions
                         // ReSharper disable StringLiteralTypo
                         Console.WriteLine(@Language_Main.Scanning);
                         Audit audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount,
-                            csvFilename);
+                            csvFilename, summary);
                         //TODO FIXME Wait for scan to be done, then exit itself.
                         Console.Write(Language_Main.ScanFinished);
                         Console.ReadKey();
@@ -105,7 +107,7 @@ namespace NTFSPermissions
             }
             else
             {
-                Audit audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount, csvFilename);
+                Audit audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount, csvFilename, summary);
                 Console.ReadKey();
                 Environment.Exit(0);
             }
