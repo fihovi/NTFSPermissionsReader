@@ -24,28 +24,28 @@
     <data name="Exiting" xml:space="preserve">
         <value>Program is exiting...</value>
     </data>
-    <data name="Scan" xml:space="preserve">
-        <value>Scan</value>
-    </data>
     <data name="Export" xml:space="preserve">
         <value>Export</value>
-    </data>
-    <data name="NotDefined" xml:space="preserve">
-        <value>{0} is not defined.</value>
-    </data>
-    <data name="ScanLocation" xml:space="preserve">
-        <value>Scan Location</value>
     </data>
     <data name="ExportLocation" xml:space="preserve">
         <value>Export location is: {0}</value>
     </data>
-    <data name="ShowSystemAccount" xml:space="preserve">
-        <value>Show system account in the report. {0}</value>
+    <data name="NotDefined" xml:space="preserve">
+        <value>{0} is not defined.</value>
+    </data>
+    <data name="Scan" xml:space="preserve">
+        <value>Scan</value>
+    </data>
+    <data name="ScanFinished" xml:space="preserve">
+        <value>Scan should be finished</value>
+    </data>
+    <data name="ScanLocation" xml:space="preserve">
+        <value>Scan Location is: {0}</value>
     </data>
     <data name="Scanning" xml:space="preserve">
         <value>Scanning.</value>
     </data>
-    <data name="ScanFinished" xml:space="preserve">
-        <value>Scan should be finished</value>
+    <data name="ShowSystemAccount" xml:space="preserve">
+        <value>Show system account in the report. {0}</value>
     </data>
 </root>

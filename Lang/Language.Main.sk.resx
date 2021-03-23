@@ -14,8 +14,11 @@
     <data name="Continue" xml:space="preserve">
         <value>Želáte si pokračovať? (a/n)</value>
     </data>
-    <data name="ShowSystemAccount" xml:space="preserve">
-        <value>Zobrazit systémový účet v reportu. {0}</value>
+    <data name="Exiting" xml:space="preserve">
+        <value>Program se vypíná...</value>
+    </data>
+    <data name="Export" xml:space="preserve">
+        <value>Export</value>
     </data>
     <data name="ExportLocation" xml:space="preserve">
         <value>Cesta exportu je: {0}</value>
@@ -30,15 +33,12 @@
         <value>Sken by mal byt hotov</value>
     </data>
     <data name="ScanLocation" xml:space="preserve">
-        <value>Cesta Skenu</value>
+        <value>Cesta Skenu je: {0}</value>
     </data>
     <data name="Scanning" xml:space="preserve">
         <value>Skenuji...</value>
     </data>
-    <data name="Export" xml:space="preserve">
-        <value>Export</value>
-    </data>
-    <data name="Exiting" xml:space="preserve">
-        <value>Program se vypíná...</value>
+    <data name="ShowSystemAccount" xml:space="preserve">
+        <value>Zobrazit systémový účet v reportu. {0}</value>
     </data>
 </root>

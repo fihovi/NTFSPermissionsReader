@@ -14,6 +14,7 @@ namespace NTFSPermissions
         private string auditLocation;
         private string exportLocation;
         private bool showSystemAccounts;
+        private bool summary;
         private bool auditEventLogs;
         private Logs log;
         private int foldersCounted = 0;
@@ -24,13 +25,15 @@ namespace NTFSPermissions
         private string csvFilename;
 
         // Entry point for the audit - manages the various configurations surrounding the audit
-        public Audit(string _auditLocation, string _exportLocation, string numLevelsDeep, bool _auditEventLogs, bool _showSystemAccounts, string _csvFilename)
+        public Audit(string _auditLocation, string _exportLocation, string numLevelsDeep, bool _auditEventLogs,
+            bool _showSystemAccounts, string _csvFilename, bool summary)
         {
             this.auditLocation = _auditLocation;
             this.exportLocation = _exportLocation;
             this.auditEventLogs = _auditEventLogs;
             this.csvFilename = _csvFilename;
             this.showSystemAccounts = _showSystemAccounts;
+            this.summary = summary;
 
             // Check how many levels deep the application needs to scan and audit
             CalculateHowManyLevelsDeepToScan(numLevelsDeep);
@@ -42,7 +45,8 @@ namespace NTFSPermissions
             // Background worker for scanning and reporting
             bgWorker_Audit = new BackgroundWorker {WorkerReportsProgress = true};
             bgWorker_Audit.DoWork += new DoWorkEventHandler(bgWorker_Scan_DoWork);
-            bgWorker_Audit.RunWorkerCompleted += new RunWorkerCompletedEventHandler((sender, e) => bgWorker_Scan_RunWorkerCompleted(sender, e));
+            bgWorker_Audit.RunWorkerCompleted += new RunWorkerCompletedEventHandler((sender, e) =>
+                bgWorker_Scan_RunWorkerCompleted(sender, e, this.summary));
             bgWorker_Audit.WorkerReportsProgress = true;
             bgWorker_Audit.RunWorkerAsync();
         }
@@ -50,7 +54,9 @@ namespace NTFSPermissions
         // Check how many levels deep the application needs to scan and audit
         private void CalculateHowManyLevelsDeepToScan(string levelsDeep)
         {
-            if (levelsDeep == "unlimited") { }
+            if (levelsDeep == "unlimited")
+            {
+            }
 
             this.numLevelsDeepSetting = levelsDeep switch
             {
@@ -72,12 +78,12 @@ namespace NTFSPermissions
         }
 
         private void bgWorker_Scan_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e,
-            bool summary = true)
+            bool summary)
         {
             var dt = DateTime.Now;
 
             // Add finished audit information to the logfile
-            if (summary)
+            if (!summary)
             {
                 log.AddToPermissionsLogFile(System.Environment.NewLine + System.Environment.NewLine +
                                             System.Environment.NewLine);
@@ -89,13 +95,14 @@ namespace NTFSPermissions
 
             if (foldersAccessErrors > 0)
             {
-                log.AddToPermissionsLogFile(System.Environment.NewLine);
+                // log.AddToPermissionsLogFile(System.Environment.NewLine);
             }
         }
 
         private void DoesFileExist()
         {
-            var file = exportLocation + @"\" + csvFilename + @"_" + auditLocation.Replace(@"\", "_").Replace(@":", "") + "-permissions.csv";
+            var file = exportLocation + @"\" + csvFilename + @"_" + auditLocation.Replace(@"\", "_").Replace(@":", "") +
+                       "-permissions.csv";
             if (File.Exists(file))
                 File.Delete(file);
         }
@@ -152,7 +159,8 @@ namespace NTFSPermissions
                             {
                                 if (showSystemAccounts)
                                 {
-                                    string csvFormat = rule.IdentityReference + " [" + rule.AccessControlType + ": " + rule.FileSystemRights + "]";
+                                    string csvFormat = rule.IdentityReference + " [" + rule.AccessControlType + ": " +
+                                                       rule.FileSystemRights + "]";
                                     string csvSantised = csvFormat.Replace(",", " ");
                                     csvPermissions += "; " + csvSantised;
                                 }
@@ -160,9 +168,10 @@ namespace NTFSPermissions
                                 {
                                     // Check results do not show system accounts
                                     if (!rule.IdentityReference.ToString().Contains("BUILTIN") &&
-                                            !rule.IdentityReference.ToString().Contains(@"NT AUTHORITY\SYSTEM"))
+                                        !rule.IdentityReference.ToString().Contains(@"NT AUTHORITY\SYSTEM"))
                                     {
-                                        string csvFormat = rule.IdentityReference + " [" + rule.AccessControlType + ": " + rule.FileSystemRights + "]";
+                                        string csvFormat = rule.IdentityReference + " [" + rule.AccessControlType +
+                                                           ": " + rule.FileSystemRights + "]";
                                         string csvSantised = csvFormat.Replace(",", " ");
                                         csvPermissions += ";" + csvSantised;
                                     }
@@ -174,7 +183,7 @@ namespace NTFSPermissions
                         // logListCSV.Add(csvDir + ", " + csvPermissions);
                         // Console.WriteLine(csvPermissions);
                         csvPermissions = csvPermissions.Replace(";", " \n");
-                        string[] Array = csvPermissions.Split("\n" [0]);
+                        string[] Array = csvPermissions.Split("\n"[0]);
                         for (int i = 0; i < Array.Length; i++)
                         {
                             logListCSV.Add(csvDir + ";" + Array[i]);
