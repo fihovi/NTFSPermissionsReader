@@ -6,10 +6,11 @@ Reads permissions of a folder and all subfolders
 
 
 ## Known bugs
+- [ ] Too many commas behind the permissions
 
 ## ToDo's
-- [ ] Localization
-- [ ] CI/CD
-  - [ ] GitHub Actions
-  - [ ] Azure Pipelines
-  - [ ] AWS CodePipeline
+- [x] Localization
+- [x] CI/CD
+  - [x] GitHub Actions
+  - [ ] ~~Azure Pipelines~~
+  - [ ] ~~AWS CodePipeline~~
