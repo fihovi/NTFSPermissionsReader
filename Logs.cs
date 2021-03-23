@@ -30,10 +30,8 @@ namespace NTFSPermissions
         {
             try
             {
-                using (StreamWriter sw = File.AppendText(permissionsLogFileLocation))
-                {
-                    sw.WriteLine(log);
-                }
+                using var sw = File.AppendText(permissionsLogFileLocation);
+                sw.WriteLine(log);
             }
             catch (Exception e)
             {
@@ -43,6 +41,7 @@ namespace NTFSPermissions
 
         // Add multiple lines to the logfile
         public void AddListToPermissionsLogFile(List<string> logs)
+        public void AddListToPermissionsLogFile(IEnumerable<string> logs)
         {
             try
             {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.IO;
-using System.Runtime.Remoting.Messaging;
 using System.Security.AccessControl; // For DirectorySecurity class
 using System.Security.Principal; // For NTAccount
 
@@ -52,15 +51,17 @@ namespace NTFSPermissions
         private void CalculateHowManyLevelsDeepToScan(string levelsDeep)
         {
             if (levelsDeep == "unlimited") { }
-            switch (levelsDeep)
+
+            this.numLevelsDeepSetting = levelsDeep switch
             {
-                case "1": this.numLevelsDeepSetting = 1; break;
-                case "2": this.numLevelsDeepSetting = 2; break;
-                case "3": this.numLevelsDeepSetting = 3; break;
-                case "4": this.numLevelsDeepSetting = 4; break;
-                case "5": this.numLevelsDeepSetting = 5; break;
-                case "Unlimited": this.numLevelsDeepSetting = 9999999; break;
-            }
+                "1" => 1,
+                "2" => 2,
+                "3" => 3,
+                "4" => 4,
+                "5" => 5,
+                "Unlimited" => 9999999,
+                _ => this.numLevelsDeepSetting
+            };
         }
 
         private void bgWorker_Scan_DoWork(object sender, DoWorkEventArgs e)
@@ -73,7 +74,7 @@ namespace NTFSPermissions
         private void bgWorker_Scan_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e,
             bool summary = true)
         {
-            DateTime dt = DateTime.Now;
+            var dt = DateTime.Now;
 
             // Add finished audit information to the logfile
             if (summary)
@@ -108,10 +109,10 @@ namespace NTFSPermissions
             }
             else
             {
-                List<string> dirs = new List<string>();
+                var dirs = new List<string>();
                 try
                 {
-                    foreach (string dir in Directory.GetDirectories(location))
+                    foreach (var dir in Directory.GetDirectories(location))
                     {
                         foldersCounted++;
                         dirs.Add(dir);
@@ -123,7 +124,7 @@ namespace NTFSPermissions
                     foldersAccessErrors++;
                 }
 
-                foreach (string dir in dirs)
+                foreach (var dir in dirs)
                 {
                     currentFolder = dir;
                     foldersScanned++;
@@ -136,7 +137,7 @@ namespace NTFSPermissions
                         var csvDir = dir;
                         var csvPermissions = "";
 
-                        DirectorySecurity dSecurity = Directory.GetAccessControl(dir);
+                        var dSecurity = Directory.GetAccessControl(dir);
                         foreach (FileSystemAccessRule rule in dSecurity.GetAccessRules(true, true, typeof(NTAccount)))
                         {
                             // Console.WriteLine(csvDir + " ::: " + rule.IdentityReference + " [" + rule.AccessControlType + ": " + rule.FileSystemRights + "]"); 

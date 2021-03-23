@@ -27,12 +27,12 @@ namespace NTFSPermissions
 
             [Option('p', "prefix", Default = "", Required = false, HelpText = @"Prefix of the report")]
             public string CsvFilename { get; set; }
-            [Option('s', "summary", Default = "", Required = false, HelpText = @"Summary on the end of a report")]
+            [Option('m', "summary", Default = "", Required = false, HelpText = @"Summary on the end of a report")]
             public string Summary { get; set; }
 
         }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             string scanLocation = "";
             string exportLocation = "";
@@ -43,6 +43,9 @@ namespace NTFSPermissions
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed<Options>(o =>
                 {
+                    Console.WriteLine(o.Verbose
+                        ? $@"Verbose output enabled. Current Arguments: -v {o.Verbose.ToString()}"
+                        : $@"Current Arguments: -v {o.Verbose.ToString()}");
                     /*Console.WriteLine(o.Verbose
                         ? $@"Verbose output enabled. Current Arguments: -v {o.Verbose}"
                         : $@"Current Arguments: -v {o.Verbose}");*/
