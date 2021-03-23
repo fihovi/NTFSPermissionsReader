@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using System.Security.AccessControl; // For DirectorySecurity class
 using System.Security.Principal; // For NTAccount
 
@@ -10,7 +11,7 @@ namespace NTFSPermissions
 {
     class Audit
     {
-        private BackgroundWorker bgWorker_Audit;
+        private readonly BackgroundWorker bgWorker_Audit;
         private string auditLocation;
         private string exportLocation;
         private bool showSystemAccounts;
@@ -21,6 +22,7 @@ namespace NTFSPermissions
         private int foldersAccessErrors = 0;
         private int numLevelsDeepSetting = 3;
         private string currentFolder = "";
+        private string csvFilename;
 
         // Entry point for the audit - manages the various configurations surrounding the audit
         public Audit(string _auditLocation, string _exportLocation, string numLevelsDeep, bool _auditEventLogs, bool _showSystemAccounts, string _csvFilename)
@@ -28,26 +30,26 @@ namespace NTFSPermissions
             this.auditLocation = _auditLocation;
             this.exportLocation = _exportLocation;
             this.auditEventLogs = _auditEventLogs;
+            this.csvFilename = _csvFilename;
             this.showSystemAccounts = _showSystemAccounts;
 
             // Check how many levels deep the application needs to scan and audit
-            calculateHowManyLevelsDeepToScan(numLevelsDeep);
+            CalculateHowManyLevelsDeepToScan(numLevelsDeep);
 
             // Configure logging
             log = new Logs();
-            log.generateFileName(exportLocation, "permissions", "csv", _csvFilename);
+            log.GenerateFileName(auditLocation, exportLocation, "permissions", "csv", _csvFilename);
 
             // Background worker for scanning and reporting
-            bgWorker_Audit = new BackgroundWorker();
-            bgWorker_Audit.WorkerReportsProgress = true;
+            bgWorker_Audit = new BackgroundWorker {WorkerReportsProgress = true};
             bgWorker_Audit.DoWork += new DoWorkEventHandler(bgWorker_Scan_DoWork);
-            bgWorker_Audit.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgWorker_Scan_RunWorkerCompleted);
+            bgWorker_Audit.RunWorkerCompleted += new RunWorkerCompletedEventHandler((sender, e) => bgWorker_Scan_RunWorkerCompleted(sender, e));
             bgWorker_Audit.WorkerReportsProgress = true;
             bgWorker_Audit.RunWorkerAsync();
         }
 
         // Check how many levels deep the application needs to scan and audit
-        private void calculateHowManyLevelsDeepToScan(string levelsDeep)
+        private void CalculateHowManyLevelsDeepToScan(string levelsDeep)
         {
             if (levelsDeep == "unlimited") { }
             switch (levelsDeep)
@@ -64,25 +66,41 @@ namespace NTFSPermissions
         private void bgWorker_Scan_DoWork(object sender, DoWorkEventArgs e)
         {
             Thread.Sleep(1500); // Sleep to stop panel flicker on shorter audits (< 1s)
-            directorySearch(auditLocation, exportLocation, showSystemAccounts, 1);
+            DoesFileExist();
+            DirectorySearch(auditLocation, exportLocation, showSystemAccounts, 1);
         }
 
-        private void bgWorker_Scan_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void bgWorker_Scan_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e,
+            bool summary = true)
         {
             DateTime dt = DateTime.Now;
 
             // Add finished audit information to the logfile
-            log.addToPermissionsLogFile(System.Environment.NewLine + System.Environment.NewLine + System.Environment.NewLine);
-            log.addToPermissionsLogFile("Folders Scanned: " + foldersScanned + " | Folders with access errors (can not scan deeper):  " + foldersAccessErrors);
-            log.addToPermissionsLogFile("Date/Time log completed:" + dt.ToString("HH:mm:ss dd/MM/yy"));
+            if (summary)
+            {
+                log.AddToPermissionsLogFile(System.Environment.NewLine + System.Environment.NewLine +
+                                            System.Environment.NewLine);
+                log.AddToPermissionsLogFile("Folders Scanned: " + foldersScanned +
+                                            " | Folders with access errors (can not scan deeper):  " +
+                                            foldersAccessErrors);
+                log.AddToPermissionsLogFile("Date/Time log completed:" + dt.ToString("HH:mm:ss dd/MM/yy"));
+            }
+
             if (foldersAccessErrors > 0)
             {
-                log.addToPermissionsLogFile(System.Environment.NewLine);
+                log.AddToPermissionsLogFile(System.Environment.NewLine);
             }
         }
 
+        private void DoesFileExist()
+        {
+            var file = exportLocation + @"\" + csvFilename + @"_" + auditLocation.Replace(@"\", "_").Replace(@":", "") + "-permissions.csv";
+            if (File.Exists(file))
+                File.Delete(file);
+        }
+
         // This function is where directories are recursively audited
-        private void directorySearch(string location, string exportLocation, bool showSystemAccounts, int currentLevel)
+        private void DirectorySearch(string location, string exportLocation, bool showSystemAccounts, int currentLevel)
         {
             if (currentLevel > numLevelsDeepSetting)
             {
@@ -112,11 +130,11 @@ namespace NTFSPermissions
 
                     try
                     {
-                        List<string> logListCSV = new List<string>();
-                        DirectoryInfo di = new DirectoryInfo(dir);
+                        var logListCSV = new List<string>();
+                        var di = new DirectoryInfo(dir);
                         var permissions = di.Attributes;
-                        string csvDir = dir;
-                        string csvPermissions = "";
+                        var csvDir = dir;
+                        var csvPermissions = "";
 
                         DirectorySecurity dSecurity = Directory.GetAccessControl(dir);
                         foreach (FileSystemAccessRule rule in dSecurity.GetAccessRules(true, true, typeof(NTAccount)))
@@ -135,7 +153,7 @@ namespace NTFSPermissions
                                 {
                                     string csvFormat = rule.IdentityReference + " [" + rule.AccessControlType + ": " + rule.FileSystemRights + "]";
                                     string csvSantised = csvFormat.Replace(",", " ");
-                                    csvPermissions += ", " + csvSantised;
+                                    csvPermissions += "; " + csvSantised;
                                 }
                                 else
                                 {
@@ -145,7 +163,7 @@ namespace NTFSPermissions
                                     {
                                         string csvFormat = rule.IdentityReference + " [" + rule.AccessControlType + ": " + rule.FileSystemRights + "]";
                                         string csvSantised = csvFormat.Replace(",", " ");
-                                        csvPermissions += ", " + csvSantised;
+                                        csvPermissions += ";" + csvSantised;
                                     }
                                 }
                             }
@@ -154,27 +172,27 @@ namespace NTFSPermissions
                         // Add string to List<string>
                         // logListCSV.Add(csvDir + ", " + csvPermissions);
                         // Console.WriteLine(csvPermissions);
-                        csvPermissions = csvPermissions.Replace(",", ",\n");
+                        csvPermissions = csvPermissions.Replace(";", " \n");
                         string[] Array = csvPermissions.Split("\n" [0]);
                         for (int i = 0; i < Array.Length; i++)
                         {
-                            logListCSV.Add(csvDir + "," + Array[i] + ", ");
+                            logListCSV.Add(csvDir + ";" + Array[i]);
                         }
                         // Console.ReadKey();
 
-                        // Add List<string> to logfile fu@"nction
-                        Console.WriteLine(String.Join("\n", logListCSV));
-                        log.addListToPermissionsLogFile(logListCSV);
+                        // Add List<string> to logfile function
+                        // Console.WriteLine(string.Join("\n", logListCSV));
+                        log.AddListToPermissionsLogFile(logListCSV);
                     }
                     catch (Exception e)
                     {
                         foldersAccessErrors++;
-                        log.addToPermissionsLogFile(" -----------------> Error accessing directory. " + e);
+                        log.AddToPermissionsLogFile(" -----------------> Error accessing directory. " + e);
                         continue;
                     }
 
                     // Keep recursive search going! 
-                    directorySearch(dir, exportLocation, showSystemAccounts, currentLevel + 1);
+                    DirectorySearch(dir, exportLocation, showSystemAccounts, currentLevel + 1);
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using CommandLine;
+using NTFSPermissions.Lang;
 
 
 namespace NTFSPermissions
@@ -7,20 +8,28 @@ namespace NTFSPermissions
     class Program
     {
         public class Options
-        { 
-            [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
+        {
+            [Option('v', "verbose", Required = false, HelpText = @"Set output to verbose messages.")]
             public bool Verbose { get; set; }
-            [Option('i', "input", Required = true, HelpText = "ScanLocation")]
+
+            [Option('i', "input", Required = true, HelpText = @"ScanLocation")]
             public string ScanLocationPath { get; set; }
-            [Option('o', "output", Required = true, HelpText = "Export Location for csv file")]
+
+            [Option('o', "output", Required = true, HelpText = @"Export Location for csv file")]
             public string ExportLocationPath { get; set; }
-            [Option('f', "force", Required = false, Default = false, HelpText = "Force skip check for scan")]
+
+            [Option('f', "force", Required = false, Default = false, HelpText = @"Force skip check for scan")]
             public bool ForceScan { get; set; }
 
-            [Option('s', "systemAccounts", Default = false, Required = false, HelpText = "Allow to include system Accounts in the report.")]
+            [Option('s', "systemAccounts", Default = false, Required = false,
+                HelpText = @"Allow to include system Accounts in the report.")]
             public bool AllowSystemAccounts { get; set; }
-            [Option('n', "filename", Default = "", Required = false, HelpText = "Nazev souboru")]
-            public string CSVFilename { get; set; }
+
+            [Option('p', "prefix", Default = "", Required = false, HelpText = @"Prefix of the report")]
+            public string CsvFilename { get; set; }
+            [Option('s', "summary", Default = "", Required = false, HelpText = @"Summary on the end of a report")]
+            public string Summary { get; set; }
+
         }
 
         static void Main(string[] args)
@@ -34,59 +43,68 @@ namespace NTFSPermissions
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed<Options>(o =>
                 {
-                    Console.WriteLine(o.Verbose
+                    /*Console.WriteLine(o.Verbose
                         ? $@"Verbose output enabled. Current Arguments: -v {o.Verbose}"
-                        : $@"Current Arguments: -v {o.Verbose}");
+                        : $@"Current Arguments: -v {o.Verbose}");*/
 
                     if (o.ScanLocationPath != "")
                         scanLocation = o.ScanLocationPath;
                     else
-                        Console.WriteLine(@"Error, scanLocation is not defined.");
+                        Console.WriteLine(Language_Main.NotDefined, Language_Main.Scan);
 
                     if (o.ExportLocationPath != "")
                         exportLocation = o.ExportLocationPath;
                     else
-                        Console.WriteLine(@"exportLocation is not defined.");
+                        Console.WriteLine(Language_Main.NotDefined, Language_Main.Export);
 
-                    if (o.CSVFilename != "")
-                        csvFilename = o.CSVFilename;
+                    if (o.CsvFilename != "")
+                        csvFilename = o.CsvFilename;
 
                     forceScan = o.ForceScan;
 
-                    Console.WriteLine(o.AllowSystemAccounts
-                    ? $@"System Accounts shown in report -s"
-                    : $@"systemAccounts not shown in report -s");
+                    /*Console.WriteLine(o.AllowSystemAccounts
+                        ? $@"System Accounts shown in report -s"
+                        : $@"systemAccounts not shown in report -s");*/
                     showSystemAccount = o.AllowSystemAccounts;
                 });
 
-            Console.WriteLine(@"Scan location: " + scanLocation);
-            Console.WriteLine(@"csv output: " + exportLocation);
-            Console.WriteLine(@"Show system accounts in report: " + showSystemAccount);
+            Console.WriteLine(Language_Main.ScanLocation, scanLocation);
+            Console.WriteLine(Language_Main.ExportLocation, exportLocation);
+            Console.WriteLine(Language_Main.ShowSystemAccount, showSystemAccount.ToString());
 
             if (!forceScan)
             {
-
                 // ReSharper disable StringLiteralTypo
-                Console.Write(@"Chcete pokračovat? (y/n)");
+                Console.Write(Language_Main.Continue);
                 string userResponse = Console.ReadLine();
                 switch (userResponse)
                 {
                     case "y":
+                    case "Y":
+                    case "a":
+                    case "A":
                         // ReSharper disable StringLiteralTypo
-                        Console.WriteLine(@"Calling scan function");
-                        Audit audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount, csvFilename);
+                        Console.WriteLine(@Language_Main.Scanning);
+                        Audit audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount,
+                            csvFilename);
+                        //TODO FIXME Wait for scan to be done, then exit itself.
+                        Console.Write(Language_Main.ScanFinished);
                         Console.ReadKey();
+                        Environment.Exit(0);
                         break;
                     default:
                         // ReSharper disable StringLiteralTypo
-                        Console.WriteLine(@"Program is turning off");
+                        Console.WriteLine(Language_Main.Exiting);
                         Console.ReadKey();
+                        Environment.Exit(0);
                         break;
                 }
             }
             else
             {
                 Audit audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount, csvFilename);
+                Console.ReadKey();
+                Environment.Exit(0);
             }
 
             Console.ReadKey();
