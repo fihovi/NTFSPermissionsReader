@@ -14,10 +14,6 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    feedsToUse: 'select'
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
@@ -26,5 +22,9 @@ steps:
     vstsFeed: '7c696108-0412-4cc7-99f2-1095b0cd371b'
 - task: DotNetCoreCLI@2
   inputs:
+    command: 'restore'
+    feedsToUse: 'select'
+- task: DotNetCoreCLI@2
+  inputs:
     command: 'build'
-    arguments: /t:restore
+    arguments: --no-restore /t:restore
