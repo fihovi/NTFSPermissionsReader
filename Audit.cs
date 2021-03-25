@@ -127,6 +127,7 @@ namespace NTFSPermissions
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine(e);
                     // Suppress error because you want the audit scan to continue
                     foldersAccessErrors++;
                 }

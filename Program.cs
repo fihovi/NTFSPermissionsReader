@@ -64,7 +64,7 @@ namespace NTFSPermissions
                     if (o.CsvFilename != "")
                         csvFilename = o.CsvFilename;
                     summary = o.Summary;
-                    Console.WriteLine(@"Summary: {0}", summary);
+                    Console.WriteLine(@"Summary: {0}", summary.ToString());
                     forceScan = o.ForceScan;
 
                     /*Console.WriteLine(o.AllowSystemAccounts
@@ -95,12 +95,14 @@ namespace NTFSPermissions
                         //TODO FIXME Wait for scan to be done, then exit itself.
                         Console.Write(Language_Main.ScanFinished);
                         Console.ReadKey();
+                        Console.Write(Language_Main.ScanFinished);
                         Environment.Exit(0);
                         break;
                     default:
                         // ReSharper disable StringLiteralTypo
                         Console.WriteLine(Language_Main.Exiting);
                         Console.ReadKey();
+                        Console.WriteLine(Language_Main.Exiting);
                         Environment.Exit(0);
                         break;
                 }
@@ -109,6 +111,7 @@ namespace NTFSPermissions
             {
                 Audit audit = new Audit(scanLocation, exportLocation, "9999999", false, showSystemAccount, csvFilename, summary);
                 Console.ReadKey();
+                Console.WriteLine(Language_Main.Exiting);
                 Environment.Exit(0);
             }
 
