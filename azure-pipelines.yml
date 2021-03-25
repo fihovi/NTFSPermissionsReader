@@ -9,7 +9,7 @@ trigger:
 pool: 'default'
 
 variables:
-  solution: '*.sln'
+  solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
@@ -17,9 +17,10 @@ steps:
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
-    restoreSolution: '*.sln'
-    #feedsToUse: 'select'
-    vstsFeed: '7c696108-0412-4cc7-99f2-1095b0cd371b'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
+    #vstsFeed: '7c696108-0412-4cc7-99f2-1095b0cd371b'
+
 - task: NuGetToolInstaller@1
   inputs:
     versionSpec: '5.x'
@@ -27,7 +28,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    #feedsToUse: 'select'
+    feedsToUse: 'select'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
