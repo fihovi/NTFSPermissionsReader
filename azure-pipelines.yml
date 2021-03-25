@@ -18,7 +18,7 @@ steps:
   inputs:
     command: 'restore'
     restoreSolution: '*.sln'
-    feedsToUse: 'select'
+    #feedsToUse: 'select'
     vstsFeed: '7c696108-0412-4cc7-99f2-1095b0cd371b'
 - task: NuGetToolInstaller@1
   inputs:
@@ -27,7 +27,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    feedsToUse: 'select'
+    #feedsToUse: 'select'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
