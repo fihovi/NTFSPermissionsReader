@@ -33,7 +33,6 @@ namespace NTFSPermissions
 
         private static void Main(string[] args)
         {
-            Console.WriteLine("Test");
             string scanLocation = "";
             string exportLocation = "";
             bool showSystemAccount = false;
