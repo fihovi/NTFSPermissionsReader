@@ -29,7 +29,7 @@ Required option 'o, output'.
   ```
 
 ## Known bugs
-- [ ] Too many commas behind the permissions
+- [ ] Program does not exit Environment when required arguments are not defined.
 
 ## ToDo's
 - [x] Localization
