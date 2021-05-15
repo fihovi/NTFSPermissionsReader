@@ -5,14 +5,35 @@
 Reads permissions of a folder and all subfolders
 
 ## Usage 
+```
+Required option 'i, input'.
+Required option 'o, output'.
 
+  -v, --verbose           Set output to verbose messages.
+
+  -i, --input             Required. ScanLocation
+
+  -o, --output            Required. Export Location for csv file
+
+  -f, --force             (Default: false) Force skip check for scan
+
+  -s, --systemAccounts    (Default: false) Allow to include system Accounts in the report.
+
+  -p, --prefix            (Default: "") Prefix of the report
+
+  -m, --summary           (Default: false) Summary on the end of a report
+
+  --help                  Display this help screen.
+
+  --version               Display version information.
+  ```
 
 ## Known bugs
-- [ ] Too many commas behind the permissions
+- [ ] Program does not exit Environment when required arguments are not defined.
 
 ## ToDo's
 - [x] Localization
 - [x] CI/CD
   - [x] GitHub Actions
-  - [ ] ~~Azure Pipelines~~
+  - [ ] Azure Pipelines
   - [ ] ~~AWS CodePipeline~~
